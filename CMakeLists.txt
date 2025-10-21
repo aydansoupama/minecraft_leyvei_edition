@@ -28,6 +28,8 @@ add_executable(minecraft_leyvei_edition
     src/Camera/Camera.h
     src/Texture/Texture.cpp
     src/Texture/Texture.h
+    src/World/World.cpp
+    src/World/World.h
 )
 
 # Link libraries

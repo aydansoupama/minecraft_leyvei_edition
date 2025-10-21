@@ -11,6 +11,7 @@
 #include "../Shader/Shader.h"
 #include "../Block/Block.h"
 #include "../Camera/Camera.h"
+#include "../World/World.h"
 
 class Game
 {
@@ -27,7 +28,7 @@ private:
 
     GLFWwindow *window = nullptr;
     Shader *shader = nullptr;
-    Block *block = nullptr;
+    World *world = nullptr;
     Camera *camera = nullptr;
 
     // Variables for camera interpolation
@@ -49,7 +50,7 @@ private:
     void clearScreen();
     void setupShader();
     void setupCameraInterpolation();
-    void drawBlock();
+    void drawWorld();
     void checkOpenGLErrors();
 };
 

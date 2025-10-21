@@ -16,6 +16,7 @@ public:
     ~Texture();
 
     void bind() const;
+    void bind(GLenum textureUnit) const;
 
     unsigned int getID() const;
 

@@ -29,6 +29,8 @@ public:
 
     ~Shader();
 
+    GLuint getID() const { return ID; }
+
 private:
     GLuint ID;
 

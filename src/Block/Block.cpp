@@ -1,11 +1,15 @@
 #include "Block.h"
 #include <glad/glad.h>
 #include <iostream>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
-constexpr float Block::vertices[36 * 3];
-constexpr float Block::texCoords[36 * 2];
+const float Block::vertices[36 * 3];
+const float Block::texCoords[36 * 2];
 
-Block::Block()
+Block::Block(BlockType type, glm::vec3 pos)
+    : position(pos)
 {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -30,21 +34,62 @@ Block::Block()
 
     glBindVertexArray(0);
 
-    // Load a default texture (e.g., stone.png)
-    texture = new Texture("assets/textures/block/stone.png");
+    // Load texture based on block type
+    switch (type)
+    {
+    case BlockType::GRASS:
+    {
+        topTexture = new Texture("assets/textures/block/grass_block_top.png");
+        sideTexture = new Texture("assets/textures/block/grass_block_side_better.png");
+        bottomTexture = new Texture("assets/textures/block/dirt.png");
+        break;
+    }
+    case BlockType::DIRT:
+        topTexture = new Texture("assets/textures/block/dirt.png");
+        sideTexture = new Texture("assets/textures/block/dirt.png");
+        bottomTexture = new Texture("assets/textures/block/dirt.png");
+        break;
+    case BlockType::STONE:
+    {
+        int variant = rand() % 7 + 1;
+        std::string stoneTexturePath = "assets/textures/block/stone" + std::to_string(variant) + ".png";
+        topTexture = new Texture(stoneTexturePath.c_str());
+        sideTexture = new Texture(stoneTexturePath.c_str());
+        bottomTexture = new Texture(stoneTexturePath.c_str());
+        break;
+    }
+    }
 }
 
 Block::~Block()
 {
-    delete texture;
+    delete topTexture;
+    delete sideTexture;
+    delete bottomTexture;
     glDeleteBuffers(1, &VBO);
     glDeleteVertexArrays(1, &VAO);
 }
 
 void Block::draw()
 {
-    texture->bind();
     glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    // Top face
+    topTexture->bind();
+    glDrawArrays(GL_TRIANGLES, 30, 6);
+
+    // Bottom face
+    bottomTexture->bind();
+    glDrawArrays(GL_TRIANGLES, 24, 6);
+
+    // Side faces (Front, Back, Left, Right)
+    sideTexture->bind();
+    glDrawArrays(GL_TRIANGLES, 0, 24);
+
     glBindVertexArray(0);
+}
+
+const glm::vec3 &Block::getPosition() const
+{
+    return position;
 }

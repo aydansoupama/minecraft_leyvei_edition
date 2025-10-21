@@ -31,7 +31,8 @@ Game::Game(int w, int h, const char *t) : width(w), height(h), title(t)
         exit(-1);
     }
 
-    block = new Block();
+    world = new World();
+    world->generatePlatform();
     camera = new Camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
     // Initialization of interpolation variables
@@ -49,7 +50,7 @@ Game::Game(int w, int h, const char *t) : width(w), height(h), title(t)
 Game::~Game()
 {
     delete shader;
-    delete block;
+    delete world;
     delete camera;
     glfwDestroyWindow(window);
     glfwTerminate();
@@ -144,7 +145,7 @@ void Game::render()
     clearScreen();
     setupShader();
     setupCameraInterpolation();
-    drawBlock();
+    world->draw();
     checkOpenGLErrors();
 }
 
@@ -178,11 +179,6 @@ void Game::setupCameraInterpolation()
     shader->setMat4("model", model);
     shader->setMat4("view", view);
     shader->setMat4("projection", projection);
-}
-
-void Game::drawBlock()
-{
-    block->draw();
 }
 
 void Game::checkOpenGLErrors()

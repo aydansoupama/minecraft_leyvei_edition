@@ -50,6 +50,12 @@ void Texture::bind() const
     glBindTexture(GL_TEXTURE_2D, id);
 }
 
+void Texture::bind(GLenum textureUnit) const
+{
+    glActiveTexture(textureUnit);
+    glBindTexture(GL_TEXTURE_2D, id);
+}
+
 unsigned int Texture::getID() const
 {
     return id;
