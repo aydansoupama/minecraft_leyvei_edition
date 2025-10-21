@@ -1,0 +1,48 @@
+# Build directories
+cmake-build-debug/
+cmake-build-release/
+build/
+
+# CMake files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# CLion files
+.idea/
+*.iml
+
+# Executables
+*.exe
+*.out
+*.app
+*.dll
+*.so
+*.dylib
+
+# Object files
+*.o
+*.obj
+*.a
+*.lib
+
+# Shader binaries or temporary files
+*.spv
+
+# Logs
+*.log
+
+# MacOS
+.DS_Store
+
+# Windows thumbnail cache
+Thumbs.db
+
+# User-specific files
+*.user
+*.user.*
+
+# Misc
+*.swp
+*.swo
