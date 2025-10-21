@@ -1,4 +1,3 @@
-//
 // Created by leyve on 21/10/2025.
 // Camera class for 3D movement and view projection.
 

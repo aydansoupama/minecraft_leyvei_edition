@@ -30,9 +30,27 @@ private:
     Block *block = nullptr;
     Camera *camera = nullptr;
 
-    void processInput();
+    // Variables for camera interpolation
+    glm::vec3 previousCameraPosition;
+    glm::vec3 nextCameraPosition;
+    double lastTickTime;
+    double lastRenderTime;
+
+    void processInput(float deltaTime);
     void update();
     void render();
+
+    // Helper methods for game loop
+    void handleGameTick(double deltaTickTime, double tickInterval, double currentTime);
+    void handleMouseInput();
+    void updateWindow();
+
+    // Helper methods for rendering
+    void clearScreen();
+    void setupShader();
+    void setupCameraInterpolation();
+    void drawBlock();
+    void checkOpenGLErrors();
 };
 
 #endif // MINECRAFT_LEYVEI_EDITION_GAME_H

@@ -4,7 +4,7 @@
 
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
     : Position(position), Up(up), Yaw(yaw), Pitch(pitch),
-      MovementSpeed(5.0f), MouseSensitivity(0.1f), Zoom(45.0f)
+      MovementSpeed(2.5f), MouseSensitivity(0.1f), Zoom(45.0f)
 {
     updateCameraVectors();
 }

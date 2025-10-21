@@ -11,18 +11,18 @@
 class Block
 {
 public:
-    Block();  // Constructeur : initialise VAO/VBO
-    ~Block(); // Destructeur : supprime VAO/VBO
+    Block();  // Constructor: initializes VAO/VBO
+    ~Block(); // Destructor: deletes VAO/VBO
 
-    void draw(); // Dessine le cube
+    void draw(); // Draws the cube
 
 private:
     GLuint VAO; // Vertex Array Object
     GLuint VBO; // Vertex Buffer Object
 
-    // Tableau des sommets du cube (x, y, z)
+    // Array of cube vertices (x, y, z)
     static constexpr float vertices[36 * 3] = {
-        // Face avant
+        // Front face
         -0.5f, -0.5f, 0.5f,
         0.5f, -0.5f, 0.5f,
         0.5f, 0.5f, 0.5f,
@@ -30,7 +30,7 @@ private:
         -0.5f, 0.5f, 0.5f,
         -0.5f, -0.5f, 0.5f,
 
-        // Face arrière
+        // Back face
         -0.5f, -0.5f, -0.5f,
         -0.5f, 0.5f, -0.5f,
         0.5f, 0.5f, -0.5f,
@@ -38,7 +38,7 @@ private:
         0.5f, -0.5f, -0.5f,
         -0.5f, -0.5f, -0.5f,
 
-        // Face gauche
+        // Left face
         -0.5f, 0.5f, 0.5f,
         -0.5f, 0.5f, -0.5f,
         -0.5f, -0.5f, -0.5f,
@@ -46,7 +46,7 @@ private:
         -0.5f, -0.5f, 0.5f,
         -0.5f, 0.5f, 0.5f,
 
-        // Face droite
+        // Right face
         0.5f, 0.5f, 0.5f,
         0.5f, -0.5f, 0.5f,
         0.5f, -0.5f, -0.5f,
@@ -54,7 +54,7 @@ private:
         0.5f, 0.5f, -0.5f,
         0.5f, 0.5f, 0.5f,
 
-        // Face dessus
+        // Top face
         -0.5f, 0.5f, 0.5f,
         0.5f, 0.5f, 0.5f,
         0.5f, 0.5f, -0.5f,
@@ -62,7 +62,7 @@ private:
         -0.5f, 0.5f, -0.5f,
         -0.5f, 0.5f, 0.5f,
 
-        // Face dessous
+        // Bottom face
         -0.5f, -0.5f, 0.5f,
         -0.5f, -0.5f, -0.5f,
         0.5f, -0.5f, -0.5f,
