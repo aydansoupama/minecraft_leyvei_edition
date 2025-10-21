@@ -10,10 +10,12 @@
 #include <GLFW/glfw3.h>
 #include "../Shader/Shader.h"
 #include "../Block/Block.h"
+#include "../Camera/Camera.h"
 
-class Game {
+class Game
+{
 public:
-    Game(int width, int height, const char* title);
+    Game(int width, int height, const char *title);
     ~Game();
 
     void run();
@@ -21,15 +23,16 @@ public:
 private:
     int width;
     int height;
-    const char* title;
+    const char *title;
 
-    GLFWwindow* window = nullptr;
-    Shader* shader = nullptr;
-    Block* block = nullptr;
+    GLFWwindow *window = nullptr;
+    Shader *shader = nullptr;
+    Block *block = nullptr;
+    Camera *camera = nullptr;
 
     void processInput();
     void update();
     void render();
 };
 
-#endif //MINECRAFT_LEYVEI_EDITION_GAME_H
+#endif // MINECRAFT_LEYVEI_EDITION_GAME_H

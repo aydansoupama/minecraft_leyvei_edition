@@ -21,6 +21,8 @@ add_executable(minecraft_leyvei_edition
         src/Block/Block.h
         src/Shader/Shader.cpp
         src/Shader/Shader.h
+        src/Camera/Camera.cpp
+        src/Camera/Camera.h
 )
 
 # Link libraries

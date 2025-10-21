@@ -5,13 +5,13 @@
 #ifndef MINECRAFT_LEYVEI_EDITION_BLOCK_H
 #define MINECRAFT_LEYVEI_EDITION_BLOCK_H
 
-
 #pragma once
 #include <glad/glad.h>
 
-class Block {
+class Block
+{
 public:
-    Block(); // Constructeur : initialise VAO/VBO
+    Block();  // Constructeur : initialise VAO/VBO
     ~Block(); // Destructeur : supprime VAO/VBO
 
     void draw(); // Dessine le cube
@@ -68,9 +68,7 @@ private:
         0.5f, -0.5f, -0.5f,
         0.5f, -0.5f, -0.5f,
         0.5f, -0.5f, 0.5f,
-        -0.5f, -0.5f, 0.5f
-    };
+        -0.5f, -0.5f, 0.5f};
 };
 
-
-#endif //MINECRAFT_LEYVEI_EDITION_BLOCK_H
+#endif // MINECRAFT_LEYVEI_EDITION_BLOCK_H
