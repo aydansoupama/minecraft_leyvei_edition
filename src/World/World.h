@@ -15,7 +15,7 @@ public:
     ~World();
 
     void generatePlatform();
-    void draw();
+    void draw(Shader *shader);
     const std::vector<Block*>& getBlocks() const;
 
 private:

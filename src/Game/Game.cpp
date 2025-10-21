@@ -145,7 +145,7 @@ void Game::render()
     clearScreen();
     setupShader();
     setupCameraInterpolation();
-    world->draw();
+    world->draw(shader);
     checkOpenGLErrors();
 }
 
@@ -159,6 +159,7 @@ void Game::setupShader()
 {
     shader->use();
     shader->setInt("texture1", 0);
+    shader->setInt("colorMap", 1);
 }
 
 void Game::setupCameraInterpolation()

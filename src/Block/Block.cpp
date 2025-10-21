@@ -42,6 +42,7 @@ Block::Block(BlockType type, glm::vec3 pos)
         topTexture = new Texture("assets/textures/block/grass_block_top.png");
         sideTexture = new Texture("assets/textures/block/grass_block_side_better.png");
         bottomTexture = new Texture("assets/textures/block/dirt.png");
+        colorMap = new Texture("assets/textures/colormap/grass.png");
         break;
     }
     case BlockType::DIRT:
@@ -66,24 +67,36 @@ Block::~Block()
     delete topTexture;
     delete sideTexture;
     delete bottomTexture;
+    if (colorMap) {
+        delete colorMap;
+    }
     glDeleteBuffers(1, &VBO);
     glDeleteVertexArrays(1, &VAO);
 }
 
-void Block::draw()
+void Block::draw(Shader *shader)
 {
     glBindVertexArray(VAO);
 
     // Top face
-    topTexture->bind();
+    topTexture->bind(GL_TEXTURE0);
+    if (colorMap) {
+        colorMap->bind(GL_TEXTURE1);
+        shader->use();
+        shader->setBool("isTopFace", true);
+    }
     glDrawArrays(GL_TRIANGLES, 30, 6);
 
     // Bottom face
-    bottomTexture->bind();
+    bottomTexture->bind(GL_TEXTURE0);
+    shader->use();
+    shader->setBool("isTopFace", false);
     glDrawArrays(GL_TRIANGLES, 24, 6);
 
     // Side faces (Front, Back, Left, Right)
-    sideTexture->bind();
+    sideTexture->bind(GL_TEXTURE0);
+    shader->use();
+    shader->setBool("isTopFace", false);
     glDrawArrays(GL_TRIANGLES, 0, 24);
 
     glBindVertexArray(0);

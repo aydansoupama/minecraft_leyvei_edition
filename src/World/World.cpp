@@ -17,9 +17,9 @@ void World::generatePlatform() {
     }
 }
 
-void World::draw() {
+void World::draw(Shader *shader) {
     for (Block* block : blocks) {
-        block->draw();
+        block->draw(shader);
     }
 }
 

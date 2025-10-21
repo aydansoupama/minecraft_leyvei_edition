@@ -8,6 +8,7 @@
 #pragma once
 #include <glm/glm.hpp>
 #include "../Texture/Texture.h"
+#include "../Shader/Shader.h"
 
 enum class BlockType
 {
@@ -22,7 +23,7 @@ public:
     Block(BlockType type, glm::vec3 pos);
     ~Block();
 
-    void draw();
+    void draw(Shader *shader);
     const glm::vec3 &getPosition() const;
 
 private:
@@ -59,12 +60,12 @@ private:
         -0.5f, -0.5f, 0.5f,
 
         // Left face
-        -0.5f, 0.5f, 0.5f,
-        -0.5f, 0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
         -0.5f, -0.5f, 0.5f,
+        -0.5f, -0.5f, -0.5f,
+        -0.5f, 0.5f, -0.5f,
+        -0.5f, 0.5f, -0.5f,
         -0.5f, 0.5f, 0.5f,
+        -0.5f, -0.5f, 0.5f,
 
         // Right face
         0.5f, -0.5f, 0.5f,
@@ -143,6 +144,7 @@ private:
     Texture *topTexture;
     Texture *sideTexture;
     Texture *bottomTexture;
+    Texture *colorMap; // Texture pour la color map
     glm::vec3 position;
 };
 
