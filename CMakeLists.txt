@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Includes
-include_directories(include external)
+include_directories(include external external/stb)
 
 # GLAD
 add_library(glad STATIC src/glad.c)
@@ -26,6 +26,8 @@ add_executable(minecraft_leyvei_edition
     src/Shader/Shader.h
     src/Camera/Camera.cpp
     src/Camera/Camera.h
+    src/Texture/Texture.cpp
+    src/Texture/Texture.h
 )
 
 # Link libraries

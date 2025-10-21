@@ -157,7 +157,7 @@ void Game::clearScreen()
 void Game::setupShader()
 {
     shader->use();
-    shader->setVec3("blockColor", glm::vec3(0.0f, 1.0f, 0.0f));
+    shader->setInt("texture1", 0);
 }
 
 void Game::setupCameraInterpolation()

@@ -1,12 +1,12 @@
 //
 // Created by leyve on 21/10/2025.
-//
-
+////
 #ifndef MINECRAFT_LEYVEI_EDITION_BLOCK_H
 #define MINECRAFT_LEYVEI_EDITION_BLOCK_H
 
 #pragma once
 #include <glad/glad.h>
+#include "../Texture/Texture.h"
 
 class Block
 {
@@ -19,6 +19,8 @@ public:
 private:
     GLuint VAO; // Vertex Array Object
     GLuint VBO; // Vertex Buffer Object
+    GLuint EBO; // Element Buffer Object (optional, if needed)
+    Texture* texture; // Texture for the block
 
     // Array of cube vertices (x, y, z)
     static constexpr float vertices[36 * 3] = {
@@ -68,7 +70,59 @@ private:
         0.5f, -0.5f, -0.5f,
         0.5f, -0.5f, -0.5f,
         0.5f, -0.5f, 0.5f,
-        -0.5f, -0.5f, 0.5f};
+        -0.5f, -0.5f, 0.5f
+    };
+
+    // Array of texture coordinates
+    static constexpr float texCoords[36 * 2] = {
+        // Front face
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        1.0f, 1.0f,
+        1.0f, 1.0f,
+        0.0f, 1.0f,
+        0.0f, 0.0f,
+
+        // Back face
+        1.0f, 0.0f,
+        1.0f, 1.0f,
+        0.0f, 1.0f,
+        0.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+
+        // Left face
+        1.0f, 0.0f,
+        0.0f, 0.0f,
+        0.0f, 1.0f,
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        1.0f, 0.0f,
+
+        // Right face
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        1.0f, 1.0f,
+        1.0f, 1.0f,
+        0.0f, 1.0f,
+        0.0f, 0.0f,
+
+        // Top face
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        1.0f, 0.0f,
+        1.0f, 0.0f,
+        0.0f, 0.0f,
+        0.0f, 1.0f,
+
+        // Bottom face
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        1.0f, 1.0f,
+        1.0f, 1.0f,
+        0.0f, 1.0f,
+        0.0f, 0.0f
+    };
 };
 
 #endif // MINECRAFT_LEYVEI_EDITION_BLOCK_H
