@@ -37,3 +37,4 @@ target_link_libraries(minecraft_leyvei_edition
 
 # Copier les shaders dans le dossier de build
 file(COPY ${CMAKE_SOURCE_DIR}/shaders DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_BINARY_DIR})
