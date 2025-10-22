@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "../../Shader/Shader.h"
+#include "../Noise/Noise.h"
 
 class Chunk {
 public:
@@ -19,6 +20,8 @@ public:
 
     Block* getBlock(int x, int y, int z);
     void setBlock(int x, int y, int z, std::shared_ptr<Block> block);
+
+    void generateTerrain(Noise& noise);
 
 private:
     int x, y, z;

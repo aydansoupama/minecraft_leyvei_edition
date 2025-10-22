@@ -1,5 +1,6 @@
 #include "Chunk.h"
 #include "../../Block/Block.h"
+#include "../Noise/Noise.h"
 
 Chunk::Chunk(int x, int y, int z) : x(x), y(y), z(z)
 {
@@ -11,6 +12,60 @@ Chunk::Chunk(int x, int y, int z) : x(x), y(y), z(z)
             for (auto &block : row)
             {
                 block = nullptr;
+            }
+        }
+    }
+}
+
+void Chunk::generateTerrain(Noise& noise) {
+    // Generate terrain using noise functions with more variation
+    for (int i = 0; i < 16; ++i) {
+        for (int k = 0; k < 16; ++k) {
+            // Calculate base height using noise
+            float baseHeight = 4 + 4 * noise.generateSimplexNoise(
+                (x * 16 + i) * 0.05f,
+                0,
+                (z * 16 + k) * 0.05f
+            );
+
+            // Add some randomness to the height
+            float heightVariation = 2 * noise.generateSimplexNoise(
+                (x * 16 + i) * 0.1f,
+                1000,
+                (z * 16 + k) * 0.1f
+            );
+
+            int surfaceHeight = static_cast<int>(baseHeight + heightVariation);
+
+            // Clamp the surface height to reasonable values
+            surfaceHeight = glm::clamp(surfaceHeight, 2, 15);
+
+            for (int j = 0; j < 16; ++j) {
+                if (j < surfaceHeight) {
+                    // Below surface - dirt or stone
+                    if (j < surfaceHeight - 2) {
+                        // Deeper layers - more likely to be stone
+                        float stoneChance = 0.3 + 0.7 * noise.generateSimplexNoise(
+                            (x * 16 + i) * 0.2f,
+                            j * 0.1f,
+                            (z * 16 + k) * 0.2f
+                        );
+                        if (stoneChance > 0.5f) {
+                            blocks[i][j][k] = std::make_shared<Block>(BlockType::STONE);
+                        } else {
+                            blocks[i][j][k] = std::make_shared<Block>(BlockType::DIRT);
+                        }
+                    } else {
+                        // Surface layers - mostly dirt
+                        blocks[i][j][k] = std::make_shared<Block>(BlockType::DIRT);
+                    }
+                } else if (j == surfaceHeight) {
+                    // Surface layer - grass
+                    blocks[i][j][k] = std::make_shared<Block>(BlockType::GRASS);
+                } else {
+                    // Above surface - air
+                    blocks[i][j][k] = std::make_shared<Block>(BlockType::AIR);
+                }
             }
         }
     }
@@ -36,36 +91,23 @@ Chunk::~Chunk()
 
 void Chunk::generate()
 {
-    // Generate a simple 16x16x16 chunk with some blocks
-    for (int i = 0; i < 16; ++i)
+    // Initialize all blocks to nullptr
+    for (auto &layer : blocks)
     {
-        for (int j = 0; j < 16; ++j)
+        for (auto &row : layer)
         {
-            for (int k = 0; k < 16; ++k)
+            for (auto &block : row)
             {
-                if (i == 0 || i == 15 || j == 0 || j == 15 || k == 0 || k == 15)
-                {
-                    // Set the outer layer to a specific block type
-                    blocks[i][j][k] = std::make_shared<Block>(BlockType::STONE);
-                }
-                else if (j < 4)
-                {
-                    // Set the bottom 4 layers to dirt
-                    blocks[i][j][k] = std::make_shared<Block>(BlockType::DIRT);
-                }
-                else if (j == 4)
-                {
-                    // Set the 5th layer to grass
-                    blocks[i][j][k] = std::make_shared<Block>(BlockType::GRASS);
-                }
-                else
-                {
-                    // Set the rest to air
-                    blocks[i][j][k] = std::make_shared<Block>(BlockType::AIR);
-                }
+                block = nullptr;
             }
         }
     }
+
+    // Create a Noise object for terrain generation
+    Noise noise;
+
+    // Generate terrain using noise functions
+    generateTerrain(noise);
 }
 
 void Chunk::render(Shader *shader)

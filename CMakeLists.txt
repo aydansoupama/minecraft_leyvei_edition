@@ -32,6 +32,8 @@ add_executable(minecraft_leyvei_edition
     src/World/World.h
     src/World/Chunk/Chunk.cpp
     src/World/Chunk/Chunk.h
+    src/World/Noise/Noise.cpp
+    src/World/Noise/Noise.h
 )
 
 # Link libraries
