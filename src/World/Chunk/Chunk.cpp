@@ -1,6 +1,7 @@
 #include "Chunk.h"
 #include "../../Block/Block.h"
 #include "../Noise/Noise.h"
+#include "../../World/World.h"
 
 Chunk::Chunk(int x, int y, int z) : x(x), y(y), z(z)
 {
@@ -73,7 +74,6 @@ void Chunk::generateTerrain(Noise& noise) {
 
 Chunk::~Chunk()
 {
-    // Clean up any dynamically allocated blocks
     for (auto &layer : blocks)
     {
         for (auto &row : layer)
@@ -110,7 +110,7 @@ void Chunk::generate()
     generateTerrain(noise);
 }
 
-void Chunk::render(Shader *shader)
+void Chunk::render(Shader *shader, World* world)
 {
     // Render all blocks in the chunk
     for (int i = 0; i < 16; ++i)
@@ -122,12 +122,14 @@ void Chunk::render(Shader *shader)
                 Block *block = blocks[i][j][k].get();
                 if (block && block->getType() != BlockType::AIR)
                 {
-                    // Set block position based on chunk position and block position
-                    glm::mat4 model = glm::mat4(1.0f);
-                    model = glm::translate(model, glm::vec3(
+                    // Calculate the block's global model matrix
+                    glm::mat4 blockModel = glm::mat4(1.0f);
+                    blockModel = glm::translate(blockModel, glm::vec3(
                                                       static_cast<float>(x * 16 + i),
-                                                      static_cast<float>(j),
+                                                      static_cast<float>(y * 16 + j),
                                                       static_cast<float>(z * 16 + k)));
+
+                    shader->setMat4("model", blockModel);
 
                     // Check if each face should be rendered
                     bool renderFront = true;
@@ -138,65 +140,141 @@ void Chunk::render(Shader *shader)
                     bool renderBottom = true;
 
                     // FRONT (Z+)
-                    if (k < 15 && blocks[i][j][k + 1] && blocks[i][j][k + 1]->getType() != BlockType::AIR)
-                        renderFront = false;
-                    else
-                        renderFront = true;
+                    if (k == 15) { // At chunk boundary Z+
+                        int neighborGlobalX = x * 16 + i;
+                        int neighborGlobalY = y * 16 + j;
+                        int neighborGlobalZ = z * 16 + k + 1;
+                        if (world->getBlock(neighborGlobalX, neighborGlobalY, neighborGlobalZ) &&
+                            world->getBlock(neighborGlobalX, neighborGlobalY, neighborGlobalZ)->getType() != BlockType::AIR) {
+                            renderFront = false;
+                        } else {
+                            renderFront = true;
+                        }
+                    } else { // Inside chunk
+                        if (blocks[i][j][k + 1] && blocks[i][j][k + 1]->getType() != BlockType::AIR)
+                            renderFront = false;
+                        else
+                            renderFront = true;
+                    }
 
                     // BACK (Z-)
-                    if (k > 0 && blocks[i][j][k - 1] && blocks[i][j][k - 1]->getType() != BlockType::AIR)
-                        renderBack = false;
-                    else
-                        renderBack = true;
+                    if (k == 0) { // At chunk boundary Z-
+                        int neighborGlobalX = x * 16 + i;
+                        int neighborGlobalY = y * 16 + j;
+                        int neighborGlobalZ = z * 16 + k - 1;
+                        if (world->getBlock(neighborGlobalX, neighborGlobalY, neighborGlobalZ) &&
+                            world->getBlock(neighborGlobalX, neighborGlobalY, neighborGlobalZ)->getType() != BlockType::AIR) {
+                            renderBack = false;
+                        } else {
+                            renderBack = true;
+                        }
+                    }
+                     else { // Inside chunk
+                        if (blocks[i][j][k - 1] && blocks[i][j][k - 1]->getType() != BlockType::AIR)
+                            renderBack = false;
+                        else
+                            renderBack = true;
+                    }
 
                     // RIGHT (X+)
-                    if (i < 15 && blocks[i + 1][j][k] && blocks[i + 1][j][k]->getType() != BlockType::AIR)
-                        renderRight = false;
-                    else
-                        renderRight = true;
+                    if (i == 15) { // At chunk boundary X+
+                        int neighborGlobalX = x * 16 + i + 1;
+                        int neighborGlobalY = y * 16 + j;
+                        int neighborGlobalZ = z * 16 + k;
+                        if (world->getBlock(neighborGlobalX, neighborGlobalY, neighborGlobalZ) &&
+                            world->getBlock(neighborGlobalX, neighborGlobalY, neighborGlobalZ)->getType() != BlockType::AIR) {
+                            renderRight = false;
+                        } else {
+                            renderRight = true;
+                        }
+                    } else { // Inside chunk
+                        if (blocks[i + 1][j][k] && blocks[i + 1][j][k]->getType() != BlockType::AIR)
+                            renderRight = false;
+                        else
+                            renderRight = true;
+                    }
 
                     // LEFT (X-)
-                    if (i > 0 && blocks[i - 1][j][k] && blocks[i - 1][j][k]->getType() != BlockType::AIR)
-                        renderLeft = false;
-                    else
-                        renderLeft = true;
+                    if (i == 0) { // At chunk boundary X-
+                        int neighborGlobalX = x * 16 + i - 1;
+                        int neighborGlobalY = y * 16 + j;
+                        int neighborGlobalZ = z * 16 + k;
+                        if (world->getBlock(neighborGlobalX, neighborGlobalY, neighborGlobalZ) &&
+                            world->getBlock(neighborGlobalX, neighborGlobalY, neighborGlobalZ)->getType() != BlockType::AIR) {
+                            renderLeft = false;
+                        }
+                         else {
+                            renderLeft = true;
+                        }
+                    } else { // Inside chunk
+                        if (blocks[i - 1][j][k] && blocks[i - 1][j][k]->getType() != BlockType::AIR)
+                            renderLeft = false;
+                        else
+                            renderLeft = true;
+                    }
 
                     // TOP (Y+)
-                    if (j < 15 && blocks[i][j + 1][k] && blocks[i][j + 1][k]->getType() != BlockType::AIR)
-                        renderTop = false;
-                    else
-                        renderTop = true;
+                    if (j == 15) { // At chunk boundary Y+
+                        int neighborGlobalX = x * 16 + i;
+                        int neighborGlobalY = y * 16 + j + 1;
+                        int neighborGlobalZ = z * 16 + k;
+                        if (world->getBlock(neighborGlobalX, neighborGlobalY, neighborGlobalZ) &&
+                            world->getBlock(neighborGlobalX, neighborGlobalY, neighborGlobalZ)->getType() != BlockType::AIR) {
+                            renderTop = false;
+                        }
+                         else {
+                            renderTop = true;
+                        }
+                    } else { // Inside chunk
+                        if (blocks[i][j + 1][k] && blocks[i][j + 1][k]->getType() != BlockType::AIR)
+                            renderTop = false;
+                        else
+                            renderTop = true;
+                    }
 
                     // BOTTOM (Y-)
-                    if (j > 0 && blocks[i][j - 1][k] && blocks[i][j - 1][k]->getType() != BlockType::AIR)
-                        renderBottom = false;
-                    else
-                        renderBottom = true;
+                    if (j == 0) { // At chunk boundary Y-
+                        int neighborGlobalX = x * 16 + i;
+                        int neighborGlobalY = y * 16 + j - 1;
+                        int neighborGlobalZ = z * 16 + k;
+                        if (world->getBlock(neighborGlobalX, neighborGlobalY, neighborGlobalZ) &&
+                            world->getBlock(neighborGlobalX, neighborGlobalY, neighborGlobalZ)->getType() != BlockType::AIR) {
+                            renderBottom = false;
+                        }
+                         else {
+                            renderBottom = true;
+                        }
+                    } else { // Inside chunk
+                        if (blocks[i][j - 1][k] && blocks[i][j - 1][k]->getType() != BlockType::AIR)
+                            renderBottom = false;
+                        else
+                            renderBottom = true;
+                    }
 
                     // Render only visible faces
                     if (renderFront)
                     {
-                        block->draw(shader, BlockFace::FRONT, glm::vec3(i, j, k));
+                        block->draw(shader, BlockFace::FRONT, glm::vec3(0.0f, 0.0f, 0.0f));
                     }
                     if (renderBack)
                     {
-                        block->draw(shader, BlockFace::BACK, glm::vec3(i, j, k));
+                        block->draw(shader, BlockFace::BACK, glm::vec3(0.0f, 0.0f, 0.0f));
                     }
                     if (renderLeft)
                     {
-                        block->draw(shader, BlockFace::LEFT, glm::vec3(i, j, k));
+                        block->draw(shader, BlockFace::LEFT, glm::vec3(0.0f, 0.0f, 0.0f));
                     }
                     if (renderRight)
                     {
-                        block->draw(shader, BlockFace::RIGHT, glm::vec3(i, j, k));
+                        block->draw(shader, BlockFace::RIGHT, glm::vec3(0.0f, 0.0f, 0.0f));
                     }
                     if (renderTop)
                     {
-                        block->draw(shader, BlockFace::TOP, glm::vec3(i, j, k));
+                        block->draw(shader, BlockFace::TOP, glm::vec3(0.0f, 0.0f, 0.0f));
                     }
                     if (renderBottom)
                     {
-                        block->draw(shader, BlockFace::BOTTOM, glm::vec3(i, j, k));
+                        block->draw(shader, BlockFace::BOTTOM, glm::vec3(0.0f, 0.0f, 0.0f));
                     }
                 }
             }

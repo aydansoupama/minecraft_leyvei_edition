@@ -10,18 +10,26 @@
 #include "../../Shader/Shader.h"
 #include "../Noise/Noise.h"
 
+// Forward declaration
+class World;
+
 class Chunk {
 public:
     Chunk(int x, int y, int z);
     ~Chunk();
 
     void generate();
-    void render(Shader* shader);
+    void render(Shader* shader, World* world);
 
     Block* getBlock(int x, int y, int z);
     void setBlock(int x, int y, int z, std::shared_ptr<Block> block);
 
     void generateTerrain(Noise& noise);
+
+    // Getters for chunk coordinates
+    int getX() const { return x; }
+    int getY() const { return y; }
+    int getZ() const { return z; }
 
 private:
     int x, y, z;

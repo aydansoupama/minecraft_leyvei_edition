@@ -3,7 +3,7 @@
 
 Noise::Noise() {
     // Initialize FastNoiseLite with default settings
-    noiseGenerator = FastNoiseLite(1337); // Seed with 1337
+    noiseGenerator = FastNoiseLite(0); // Seed with 1337
 }
 
 Noise::~Noise() {

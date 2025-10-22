@@ -22,12 +22,13 @@ public:
     void generateChunks();
     void draw(Shader* shader);
     const std::vector<Block*>& getBlocks() const;
+    Block* getBlock(int globalX, int globalY, int globalZ);
 
 private:
     std::vector<Block*> blocks;
     std::vector<std::shared_ptr<Chunk>> chunks;
-    int width = 16;
-    int height = 16;
+    int width = 64;
+    int height = 64;
     int depth = 16;
 };
 
