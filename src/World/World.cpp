@@ -12,14 +12,27 @@ World::~World() {
 void World::generatePlatform() {
     for (int x = 0; x < width; ++x) {
         for (int z = 0; z < depth; ++z) {
-            blocks.push_back(new Block(BlockType::GRASS, glm::vec3(x, 0, z)));
+            blocks.push_back(new Block(BlockType::GRASS));
         }
     }
 }
 
-void World::draw(Shader *shader) {
+void World::generateChunks() {
+    // Create a single chunk for demonstration
+    chunks.push_back(std::make_shared<Chunk>(0, 0, 0));
+    chunks.back()->generate();
+}
+
+void World::draw(Shader* shader) {
+    // Draw all blocks in the old system
     for (Block* block : blocks) {
-        block->draw(shader);
+        // This is a placeholder - we need to implement proper block drawing
+        // with face culling and texture mapping
+    }
+
+    // Draw all chunks
+    for (auto& chunk : chunks) {
+        chunk->render(shader);
     }
 }
 

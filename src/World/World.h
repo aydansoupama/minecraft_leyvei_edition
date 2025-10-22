@@ -7,7 +7,11 @@
 
 #pragma once
 #include <vector>
+#include <memory>
 #include "../Block/Block.h"
+#include "../Shader/Shader.h"
+#include <glm/glm.hpp>
+#include "Chunk/Chunk.h"
 
 class World {
 public:
@@ -15,11 +19,13 @@ public:
     ~World();
 
     void generatePlatform();
-    void draw(Shader *shader);
+    void generateChunks();
+    void draw(Shader* shader);
     const std::vector<Block*>& getBlocks() const;
 
 private:
     std::vector<Block*> blocks;
+    std::vector<std::shared_ptr<Chunk>> chunks;
     int width = 16;
     int height = 16;
     int depth = 16;

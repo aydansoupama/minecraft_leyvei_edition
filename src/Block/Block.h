@@ -1,151 +1,49 @@
-//
-// Created by Cline on 21/10/2025.
-//
+#ifndef BLOCK_H
+#define BLOCK_H
 
-#ifndef MINECRAFT_LEYVEI_EDITION_BLOCK_H
-#define MINECRAFT_LEYVEI_EDITION_BLOCK_H
-
-#pragma once
+#include <memory>
 #include <glm/glm.hpp>
-#include "../Texture/Texture.h"
-#include "../Shader/Shader.h"
+#include <string>
+#include <map>
+#include <glad/glad.h>
 
-enum class BlockType
-{
-    GRASS,
-    DIRT,
-    STONE
+class Shader;
+class Texture;
+
+enum class BlockFace {
+    FRONT,
+    BACK,
+    LEFT,
+    RIGHT,
+    TOP,
+    BOTTOM
 };
 
-class Block
-{
+enum class BlockType {
+    AIR,
+    STONE,
+    DIRT,
+    GRASS,
+    // Add more block types as needed
+};
+
+class Block {
 public:
-    Block(BlockType type, glm::vec3 pos);
+    Block(BlockType type);
     ~Block();
 
-    void draw(Shader *shader);
-    const glm::vec3 &getPosition() const;
+    BlockType getType() const;
+    void setType(BlockType type);
+    void draw(Shader* shader, BlockFace face, const glm::vec3& blockPosition);
 
 private:
-    static constexpr int faceIDs[36] = {
-        // Face 0: Front face
-        0, 0, 0, 0, 0, 0,
-        // Face 1: Back face
-        1, 1, 1, 1, 1, 1,
-        // Face 2: Left face
-        2, 2, 2, 2, 2, 2,
-        // Face 3: Right face
-        3, 3, 3, 3, 3, 3,
-        // Face 4: Top face
-        4, 4, 4, 4, 4, 4,
-        // Face 5: Bottom face
-        5, 5, 5, 5, 5, 5
-    };
-
-    static constexpr float vertices[36 * 3] = {
-        // Front face
-        -0.5f, -0.5f, -0.5f,
-        0.5f, -0.5f, -0.5f,
-        0.5f, 0.5f, -0.5f,
-        0.5f, 0.5f, -0.5f,
-        -0.5f, 0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
-
-        // Back face
-        -0.5f, -0.5f, 0.5f,
-        0.5f, -0.5f, 0.5f,
-        0.5f, 0.5f, 0.5f,
-        0.5f, 0.5f, 0.5f,
-        -0.5f, 0.5f, 0.5f,
-        -0.5f, -0.5f, 0.5f,
-
-        // Left face
-        -0.5f, -0.5f, 0.5f,
-        -0.5f, -0.5f, -0.5f,
-        -0.5f, 0.5f, -0.5f,
-        -0.5f, 0.5f, -0.5f,
-        -0.5f, 0.5f, 0.5f,
-        -0.5f, -0.5f, 0.5f,
-
-        // Right face
-        0.5f, -0.5f, 0.5f,
-        0.5f, -0.5f, -0.5f,
-        0.5f, 0.5f, -0.5f,
-        0.5f, 0.5f, -0.5f,
-        0.5f, 0.5f, 0.5f,
-        0.5f, -0.5f, 0.5f,
-
-        // Bottom face
-        -0.5f, -0.5f, -0.5f,
-        0.5f, -0.5f, -0.5f,
-        0.5f, -0.5f, 0.5f,
-        0.5f, -0.5f, 0.5f,
-        -0.5f, -0.5f, 0.5f,
-        -0.5f, -0.5f, -0.5f,
-
-        // Top face
-        -0.5f, 0.5f, -0.5f,
-        0.5f, 0.5f, -0.5f,
-        0.5f, 0.5f, 0.5f,
-        0.5f, 0.5f, 0.5f,
-        -0.5f, 0.5f, 0.5f,
-        -0.5f, 0.5f, -0.5f};
-
-    static constexpr float texCoords[36 * 2] = {
-        // Front face
-        0.0f, 0.0f,
-        1.0f, 0.0f,
-        1.0f, 1.0f,
-        1.0f, 1.0f,
-        0.0f, 1.0f,
-        0.0f, 0.0f,
-
-        // Back face
-        0.0f, 0.0f,
-        1.0f, 0.0f,
-        1.0f, 1.0f,
-        1.0f, 1.0f,
-        0.0f, 1.0f,
-        0.0f, 0.0f,
-
-        // Left face
-        0.0f, 0.0f,
-        1.0f, 0.0f,
-        1.0f, 1.0f,
-        1.0f, 1.0f,
-        0.0f, 1.0f,
-        0.0f, 0.0f,
-
-        // Right face
-        0.0f, 0.0f,
-        1.0f, 0.0f,
-        1.0f, 1.0f,
-        1.0f, 1.0f,
-        0.0f, 1.0f,
-        0.0f, 0.0f,
-
-        // Bottom face
-        0.0f, 0.0f,
-        1.0f, 0.0f,
-        1.0f, 1.0f,
-        1.0f, 1.0f,
-        0.0f, 1.0f,
-        0.0f, 0.0f,
-
-        // Top face
-        0.0f, 0.0f,
-        1.0f, 0.0f,
-        1.0f, 1.0f,
-        1.0f, 1.0f,
-        0.0f, 1.0f,
-        0.0f, 0.0f};
-
-    unsigned int VAO, VBO;
-    Texture *topTexture;
-    Texture *sideTexture;
-    Texture *bottomTexture;
-    Texture *colorMap; // Texture pour la color map
+    BlockType type;
     glm::vec3 position;
-};
+    static std::map<BlockType, Texture*> textures;
+    static bool texturesLoaded;
 
-#endif // MINECRAFT_LEYVEI_EDITION_BLOCK_H
+    static void loadTextures();
+    static Texture* getTextureForType(BlockType type);
+    static void setupFaceVertices(BlockFace face, float* vertices, const glm::vec3& position);
+};
+#endif // BLOCK_H

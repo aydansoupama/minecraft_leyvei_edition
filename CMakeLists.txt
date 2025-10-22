@@ -30,6 +30,8 @@ add_executable(minecraft_leyvei_edition
     src/Texture/Texture.h
     src/World/World.cpp
     src/World/World.h
+    src/World/Chunk/Chunk.cpp
+    src/World/Chunk/Chunk.h
 )
 
 # Link libraries

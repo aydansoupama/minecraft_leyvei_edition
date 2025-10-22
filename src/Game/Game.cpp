@@ -33,6 +33,7 @@ Game::Game(int w, int h, const char *t) : width(w), height(h), title(t)
 
     world = new World();
     world->generatePlatform();
+    world->generateChunks();
     camera = new Camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
     // Initialization of interpolation variables

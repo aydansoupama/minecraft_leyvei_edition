@@ -1,108 +1,148 @@
 #include "Block.h"
-#include <glad/glad.h>
+#include "../Shader/Shader.h"
+#include "../Texture/Texture.h"
 #include <iostream>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
-const float Block::vertices[36 * 3];
-const float Block::texCoords[36 * 2];
+// Initialize static members
+std::map<BlockType, Texture*> Block::textures;
+bool Block::texturesLoaded = false;
 
-Block::Block(BlockType type, glm::vec3 pos)
-    : position(pos)
-{
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
+Block::Block(BlockType type) : type(type), position(0.0f, 0.0f, 0.0f) {}
 
+Block::~Block() {}
+
+BlockType Block::getType() const {
+    return type;
+}
+
+void Block::setType(BlockType type) {
+    this->type = type;
+}
+
+void Block::loadTextures() {
+    if (texturesLoaded) return;
+
+    // Load textures for each block type
+    textures[BlockType::STONE] = new Texture("assets/textures/block/stone.png");
+    textures[BlockType::DIRT] = new Texture("assets/textures/block/dirt.png");
+    textures[BlockType::GRASS] = new Texture("assets/textures/block/grass_block_top.png");
+
+    texturesLoaded = true;
+    std::cout << "Block textures loaded successfully!" << std::endl;
+}
+
+Texture* Block::getTextureForType(BlockType type) {
+    if (!texturesLoaded) {
+        loadTextures();
+    }
+
+    auto it = textures.find(type);
+    if (it != textures.end()) {
+        return it->second;
+    }
+    return nullptr; // No texture for this type
+}
+
+void Block::setupFaceVertices(BlockFace face, float* vertices, const glm::vec3& position) {
+    // Define vertices for a single face with proper texture orientation
+    // The texture coordinates are set to match Minecraft's standard orientation
+    float x = position.x;
+    float y = position.y;
+    float z = position.z;
+
+    switch(face) {
+        case BlockFace::FRONT: // Z+
+            vertices[0] = x - 0.5f; vertices[1] = y - 0.5f; vertices[2] = z + 0.5f; vertices[3] = 0.0f; vertices[4] = 0.0f;
+            vertices[5] = x + 0.5f; vertices[6] = y - 0.5f; vertices[7] = z + 0.5f; vertices[8] = 1.0f; vertices[9] = 0.0f;
+            vertices[10] = x + 0.5f; vertices[11] = y + 0.5f; vertices[12] = z + 0.5f; vertices[13] = 1.0f; vertices[14] = 1.0f;
+            vertices[15] = x + 0.5f; vertices[16] = y + 0.5f; vertices[17] = z + 0.5f; vertices[18] = 1.0f; vertices[19] = 1.0f;
+            vertices[20] = x - 0.5f; vertices[21] = y + 0.5f; vertices[22] = z + 0.5f; vertices[23] = 0.0f; vertices[24] = 1.0f;
+            vertices[25] = x - 0.5f; vertices[26] = y - 0.5f; vertices[27] = z + 0.5f; vertices[28] = 0.0f; vertices[29] = 0.0f;
+            break;
+        case BlockFace::BACK: // Z-
+            vertices[0] = x + 0.5f; vertices[1] = y - 0.5f; vertices[2] = z - 0.5f; vertices[3] = 0.0f; vertices[4] = 0.0f;
+            vertices[5] = x - 0.5f; vertices[6] = y - 0.5f; vertices[7] = z - 0.5f; vertices[8] = 1.0f; vertices[9] = 0.0f;
+            vertices[10] = x - 0.5f; vertices[11] = y + 0.5f; vertices[12] = z - 0.5f; vertices[13] = 1.0f; vertices[14] = 1.0f;
+            vertices[15] = x - 0.5f; vertices[16] = y + 0.5f; vertices[17] = z - 0.5f; vertices[18] = 1.0f; vertices[19] = 1.0f;
+            vertices[20] = x + 0.5f; vertices[21] = y + 0.5f; vertices[22] = z - 0.5f; vertices[23] = 0.0f; vertices[24] = 1.0f;
+            vertices[25] = x + 0.5f; vertices[26] = y - 0.5f; vertices[27] = z - 0.5f; vertices[28] = 0.0f; vertices[29] = 0.0f;
+            break;
+        case BlockFace::RIGHT: // X+
+            vertices[0] = x + 0.5f; vertices[1] = y - 0.5f; vertices[2] = z - 0.5f; vertices[3] = 0.0f; vertices[4] = 0.0f;
+            vertices[5] = x + 0.5f; vertices[6] = y - 0.5f; vertices[7] = z + 0.5f; vertices[8] = 1.0f; vertices[9] = 0.0f;
+            vertices[10] = x + 0.5f; vertices[11] = y + 0.5f; vertices[12] = z + 0.5f; vertices[13] = 1.0f; vertices[14] = 1.0f;
+            vertices[15] = x + 0.5f; vertices[16] = y + 0.5f; vertices[17] = z + 0.5f; vertices[18] = 1.0f; vertices[19] = 1.0f;
+            vertices[20] = x + 0.5f; vertices[21] = y + 0.5f; vertices[22] = z - 0.5f; vertices[23] = 0.0f; vertices[24] = 1.0f;
+            vertices[25] = x + 0.5f; vertices[26] = y - 0.5f; vertices[27] = z - 0.5f; vertices[28] = 0.0f; vertices[29] = 0.0f;
+            break;
+        case BlockFace::LEFT: // X-
+            vertices[0] = x - 0.5f; vertices[1] = y - 0.5f; vertices[2] = z + 0.5f; vertices[3] = 0.0f; vertices[4] = 0.0f;
+            vertices[5] = x - 0.5f; vertices[6] = y - 0.5f; vertices[7] = z - 0.5f; vertices[8] = 1.0f; vertices[9] = 0.0f;
+            vertices[10] = x - 0.5f; vertices[11] = y + 0.5f; vertices[12] = z - 0.5f; vertices[13] = 1.0f; vertices[14] = 1.0f;
+            vertices[15] = x - 0.5f; vertices[16] = y + 0.5f; vertices[17] = z - 0.5f; vertices[18] = 1.0f; vertices[19] = 1.0f;
+            vertices[20] = x - 0.5f; vertices[21] = y + 0.5f; vertices[22] = z + 0.5f; vertices[23] = 0.0f; vertices[24] = 1.0f;
+            vertices[25] = x - 0.5f; vertices[26] = y - 0.5f; vertices[27] = z + 0.5f; vertices[28] = 0.0f; vertices[29] = 0.0f;
+            break;
+        case BlockFace::TOP: // Y+
+            vertices[0] = x - 0.5f; vertices[1] = y + 0.5f; vertices[2] = z + 0.5f; vertices[3] = 0.0f; vertices[4] = 0.0f;
+            vertices[5] = x + 0.5f; vertices[6] = y + 0.5f; vertices[7] = z + 0.5f; vertices[8] = 1.0f; vertices[9] = 0.0f;
+            vertices[10] = x + 0.5f; vertices[11] = y + 0.5f; vertices[12] = z - 0.5f; vertices[13] = 1.0f; vertices[14] = 1.0f;
+            vertices[15] = x + 0.5f; vertices[16] = y + 0.5f; vertices[17] = z - 0.5f; vertices[18] = 1.0f; vertices[19] = 1.0f;
+            vertices[20] = x - 0.5f; vertices[21] = y + 0.5f; vertices[22] = z - 0.5f; vertices[23] = 0.0f; vertices[24] = 1.0f;
+            vertices[25] = x - 0.5f; vertices[26] = y + 0.5f; vertices[27] = z + 0.5f; vertices[28] = 0.0f; vertices[29] = 0.0f;
+            break;
+        case BlockFace::BOTTOM: // Y-
+            vertices[0] = x - 0.5f; vertices[1] = y - 0.5f; vertices[2] = z - 0.5f; vertices[3] = 0.0f; vertices[4] = 0.0f;
+            vertices[5] = x + 0.5f; vertices[6] = y - 0.5f; vertices[7] = z - 0.5f; vertices[8] = 1.0f; vertices[9] = 0.0f;
+            vertices[10] = x + 0.5f; vertices[11] = y - 0.5f; vertices[12] = z + 0.5f; vertices[13] = 1.0f; vertices[14] = 1.0f;
+            vertices[15] = x + 0.5f; vertices[16] = y - 0.5f; vertices[17] = z + 0.5f; vertices[18] = 1.0f; vertices[19] = 1.0f;
+            vertices[20] = x - 0.5f; vertices[21] = y - 0.5f; vertices[22] = z + 0.5f; vertices[23] = 0.0f; vertices[24] = 1.0f;
+            vertices[25] = x - 0.5f; vertices[26] = y - 0.5f; vertices[27] = z - 0.5f; vertices[28] = 0.0f; vertices[29] = 0.0f;
+            break;
+    }
+}
+
+void Block::draw(Shader* shader, BlockFace face, const glm::vec3& blockPosition) {
+    // Load textures if not already loaded
+    if (!texturesLoaded) {
+        loadTextures();
+    }
+
+    // Get texture for this block type
+    Texture* texture = getTextureForType(type);
+    if (!texture) return;
+
+    // Setup vertices for this specific face
+    float vertices[30]; // 6 vertices * 5 components each
+    setupFaceVertices(face, vertices, blockPosition);
+
+    // Create and configure VAO, VBO for this face
+    static unsigned int VBO, VAO;
+    static bool initialized = false;
+
+    if (!initialized) {
+        glGenVertexArrays(1, &VAO);
+        glGenBuffers(1, &VBO);
+        initialized = true;
+    }
+
+    // Bind texture
+    texture->bind(GL_TEXTURE0);
+    shader->setInt("texture1", 0);
+
+    // Configure VBO with face vertices
     glBindVertexArray(VAO);
-
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) + sizeof(texCoords), nullptr, GL_STATIC_DRAW);
-
-    // Load vertices data
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-    // Load texture coordinates data
-    glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(texCoords), texCoords);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
 
     // Position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    // Texture coordinate attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)(sizeof(vertices)));
+    // Texture coord attribute
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    glBindVertexArray(0);
-
-    // Load texture based on block type
-    switch (type)
-    {
-    case BlockType::GRASS:
-    {
-        topTexture = new Texture("assets/textures/block/grass_block_top.png");
-        sideTexture = new Texture("assets/textures/block/grass_block_side_better.png");
-        bottomTexture = new Texture("assets/textures/block/dirt.png");
-        colorMap = new Texture("assets/textures/colormap/grass.png");
-        break;
-    }
-    case BlockType::DIRT:
-        topTexture = new Texture("assets/textures/block/dirt.png");
-        sideTexture = new Texture("assets/textures/block/dirt.png");
-        bottomTexture = new Texture("assets/textures/block/dirt.png");
-        break;
-    case BlockType::STONE:
-    {
-        int variant = rand() % 7 + 1;
-        std::string stoneTexturePath = "assets/textures/block/stone" + std::to_string(variant) + ".png";
-        topTexture = new Texture(stoneTexturePath.c_str());
-        sideTexture = new Texture(stoneTexturePath.c_str());
-        bottomTexture = new Texture(stoneTexturePath.c_str());
-        break;
-    }
-    }
-}
-
-Block::~Block()
-{
-    delete topTexture;
-    delete sideTexture;
-    delete bottomTexture;
-    if (colorMap) {
-        delete colorMap;
-    }
-    glDeleteBuffers(1, &VBO);
-    glDeleteVertexArrays(1, &VAO);
-}
-
-void Block::draw(Shader *shader)
-{
-    glBindVertexArray(VAO);
-
-    // Top face
-    topTexture->bind(GL_TEXTURE0);
-    if (colorMap) {
-        colorMap->bind(GL_TEXTURE1);
-        shader->use();
-        shader->setBool("isTopFace", true);
-    }
-    glDrawArrays(GL_TRIANGLES, 30, 6);
-
-    // Bottom face
-    bottomTexture->bind(GL_TEXTURE0);
-    shader->use();
-    shader->setBool("isTopFace", false);
-    glDrawArrays(GL_TRIANGLES, 24, 6);
-
-    // Side faces (Front, Back, Left, Right)
-    sideTexture->bind(GL_TEXTURE0);
-    shader->use();
-    shader->setBool("isTopFace", false);
-    glDrawArrays(GL_TRIANGLES, 0, 24);
-
-    glBindVertexArray(0);
-}
-
-const glm::vec3 &Block::getPosition() const
-{
-    return position;
+    // Draw the face
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
