@@ -2,18 +2,18 @@
 #define NOISE_H
 
 #include <glm/glm.hpp>
-#include "FastNoiseLite.h"
+#include "PerlinNoise.h"
 
 class Noise {
 public:
-    Noise();
+    Noise(uint32_t seed = 0);
     ~Noise();
 
     float generatePerlinNoise(float x, float y, float z);
-    float generateSimplexNoise(float x, float y, float z);
+    float generatePerlinOctaves(float x, float y, float z, int octaves = 4, float persistence = 0.5f);
 
 private:
-    FastNoiseLite noiseGenerator;
+    PerlinNoise perlinNoise;
 };
 
 #endif // NOISE_H

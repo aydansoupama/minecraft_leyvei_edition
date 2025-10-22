@@ -5,48 +5,47 @@
 
 Chunk::Chunk(int x, int y, int z) : x(x), y(y), z(z)
 {
-    // Initialize all blocks to nullptr
+    // Initialize the 3D vector structure for blocks
+    blocks.resize(CHUNK_SIZE_X);
     for (auto &layer : blocks)
     {
+        layer.resize(CHUNK_SIZE_Y);
         for (auto &row : layer)
         {
-            for (auto &block : row)
-            {
-                block = nullptr;
-            }
+            row.resize(CHUNK_SIZE_Z, nullptr);
         }
     }
 }
 
 void Chunk::generateTerrain(Noise& noise) {
     // Generate terrain using noise functions with more variation
-    for (int i = 0; i < 16; ++i) {
-        for (int k = 0; k < 16; ++k) {
+    for (int i = 0; i < CHUNK_SIZE_X; ++i) {
+        for (int k = 0; k < CHUNK_SIZE_Z; ++k) {
             // Calculate base height using noise
-            float baseHeight = 4 + 4 * noise.generateSimplexNoise(
-                (x * 16 + i) * 0.05f,
+            float baseHeight = 64 + 32 * noise.generatePerlinOctaves(
+                (x * CHUNK_SIZE_X + i) * 0.01f,
                 0,
-                (z * 16 + k) * 0.05f
+                (z * CHUNK_SIZE_Z + k) * 0.01f
             );
 
             // Add some randomness to the height
-            float heightVariation = 2 * noise.generateSimplexNoise(
-                (x * 16 + i) * 0.1f,
+            float heightVariation = 16 * noise.generatePerlinOctaves(
+                (x * CHUNK_SIZE_X + i) * 0.05f,
                 1000,
-                (z * 16 + k) * 0.1f
+                (z * CHUNK_SIZE_Z + k) * 0.05f
             );
 
             int surfaceHeight = static_cast<int>(baseHeight + heightVariation);
 
             // Clamp the surface height to reasonable values
-            surfaceHeight = glm::clamp(surfaceHeight, 2, 15);
+            surfaceHeight = glm::clamp(surfaceHeight, 32, CHUNK_SIZE_Y - 1);
 
-            for (int j = 0; j < 16; ++j) {
+            for (int j = 0; j < CHUNK_SIZE_Y; ++j) {
                 if (j < surfaceHeight) {
                     // Below surface - dirt or stone
                     if (j < surfaceHeight - 2) {
                         // Deeper layers - more likely to be stone
-                        float stoneChance = 0.3 + 0.7 * noise.generateSimplexNoise(
+                        float stoneChance = 0.3 + 0.7 * noise.generatePerlinOctaves(
                             (x * 16 + i) * 0.2f,
                             j * 0.1f,
                             (z * 16 + k) * 0.2f
@@ -54,15 +53,18 @@ void Chunk::generateTerrain(Noise& noise) {
                         if (stoneChance > 0.5f) {
                             blocks[i][j][k] = std::make_shared<Block>(BlockType::STONE);
                         } else {
-                            blocks[i][j][k] = std::make_shared<Block>(BlockType::DIRT);
+                            // blocks[i][j][k] = std::make_shared<Block>(BlockType::DIRT);
+                            blocks[i][j][k] = std::make_shared<Block>(BlockType::STONE);
                         }
                     } else {
                         // Surface layers - mostly dirt
-                        blocks[i][j][k] = std::make_shared<Block>(BlockType::DIRT);
+                        // blocks[i][j][k] = std::make_shared<Block>(BlockType::DIRT);
+                        blocks[i][j][k] = std::make_shared<Block>(BlockType::STONE);
                     }
                 } else if (j == surfaceHeight) {
                     // Surface layer - grass
-                    blocks[i][j][k] = std::make_shared<Block>(BlockType::GRASS);
+                    // blocks[i][j][k] = std::make_shared<Block>(BlockType::GRASS);
+                    blocks[i][j][k] = std::make_shared<Block>(BlockType::STONE);
                 } else {
                     // Above surface - air
                     blocks[i][j][k] = std::make_shared<Block>(BlockType::AIR);
@@ -104,7 +106,7 @@ void Chunk::generate()
     }
 
     // Create a Noise object for terrain generation
-    Noise noise;
+    Noise noise(1337); // Graine fixe pour la reproductibilité
 
     // Generate terrain using noise functions
     generateTerrain(noise);
@@ -113,11 +115,11 @@ void Chunk::generate()
 void Chunk::render(Shader *shader, World* world)
 {
     // Render all blocks in the chunk
-    for (int i = 0; i < 16; ++i)
+    for (int i = 0; i < CHUNK_SIZE_X; ++i)
     {
-        for (int j = 0; j < 16; ++j)
+        for (int j = 0; j < CHUNK_SIZE_Y; ++j)
         {
-            for (int k = 0; k < 16; ++k)
+            for (int k = 0; k < CHUNK_SIZE_Z; ++k)
             {
                 Block *block = blocks[i][j][k].get();
                 if (block && block->getType() != BlockType::AIR)
@@ -293,7 +295,7 @@ Block *Chunk::getBlock(int x, int y, int z)
 
 void Chunk::setBlock(int x, int y, int z, std::shared_ptr<Block> block)
 {
-    if (x >= 0 && x < 16 && y >= 0 && y < 16 && z >= 0 && z < 16)
+    if (x >= 0 && x < CHUNK_SIZE_X && y >= 0 && y < CHUNK_SIZE_Y && z >= 0 && z < CHUNK_SIZE_Z)
     {
         blocks[x][y][z] = block;
     }

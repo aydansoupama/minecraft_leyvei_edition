@@ -1,9 +1,8 @@
 #include "Noise.h"
 #include <glm/glm.hpp>
 
-Noise::Noise() {
-    // Initialize FastNoiseLite with default settings
-    noiseGenerator = FastNoiseLite(0); // Seed with 1337
+Noise::Noise(uint32_t seed) : perlinNoise(seed) {
+    // Initialisation avec la graine fournie
 }
 
 Noise::~Noise() {
@@ -11,11 +10,11 @@ Noise::~Noise() {
 }
 
 float Noise::generatePerlinNoise(float x, float y, float z) {
-    // Generate Perlin noise using FastNoiseLite
-    return noiseGenerator.GetNoise(x, y, z);
+    // Génère du bruit de Perlin 3D avec notre implémentation
+    return static_cast<float>(perlinNoise.noise(x, y, z));
 }
 
-float Noise::generateSimplexNoise(float x, float y, float z) {
-    // Generate Simplex noise using FastNoiseLite
-    return noiseGenerator.GetNoise(x, y, z);
+float Noise::generatePerlinOctaves(float x, float y, float z, int octaves, float persistence) {
+    // Génère du bruit de Perlin 3D avec plusieurs octaves
+    return static_cast<float>(perlinNoise.octaveNoise(x, y, z, octaves, static_cast<double>(persistence)));
 }

@@ -20,20 +20,29 @@ add_executable(minecraft_leyvei_edition
     src/main.cpp
     src/Game/Game.cpp
     src/Game/Game.h
+    
     src/Block/Block.cpp
     src/Block/Block.h
+    
     src/Shader/Shader.cpp
     src/Shader/Shader.h
+    
     src/Camera/Camera.cpp
     src/Camera/Camera.h
+    
     src/Texture/Texture.cpp
     src/Texture/Texture.h
+    
     src/World/World.cpp
     src/World/World.h
+    
     src/World/Chunk/Chunk.cpp
     src/World/Chunk/Chunk.h
+
     src/World/Noise/Noise.cpp
     src/World/Noise/Noise.h
+    src/World/Noise/PerlinNoise.cpp
+    src/World/Noise/PerlinNoise.h
 )
 
 # Link libraries

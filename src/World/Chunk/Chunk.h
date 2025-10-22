@@ -33,7 +33,10 @@ public:
 
 private:
     int x, y, z;
-    std::array<std::array<std::array<std::shared_ptr<Block>, 16>, 16>, 16> blocks;
+    static constexpr int CHUNK_SIZE_X = 16;
+    static constexpr int CHUNK_SIZE_Y = 384; // Nouvelle hauteur de chunk
+    static constexpr int CHUNK_SIZE_Z = 16;
+    std::vector<std::vector<std::vector<std::shared_ptr<Block>>>> blocks;
 };
 
 #endif // CHUNK_H
